@@ -58,7 +58,7 @@ def exportIndexMap(fs,level_keys,base_map,target_lv,lv=0,parent_idx=-1):
             idx=level_keys[key][0]
             exportIndexMap(fs, level_keys[key][1], base_map, target_lv, new_lv, idx)
         for idx in base_map:
-            fs.write('%d\n'%idx)
+            fs.write('%d\n\n'%idx)
     
 root=sys.argv[1]
 dst=sys.argv[2]

@@ -14,10 +14,14 @@ def exportData(root,root_name,fst,fsv,cls_map,dst_path,ntrain):
     if root_name in keys:
         total_class_count+=1
         print 'processing on %s %d/%d'%(root_name,total_class_count,len(keys))
-        if ntrain<1:
+        if ntrain<=1:
             for file in os.listdir(root):
                 total_data+=1
-            itrain=total_data*ntrain 
+            total_data+=1
+            if ntrain<1:
+                itrain=total_data*ntrain 
+            else:
+                itrain=total_data
         
     for file in os.listdir(root):
         new_path=os.path.join(root,file)
@@ -30,9 +34,9 @@ def exportData(root,root_name,fst,fsv,cls_map,dst_path,ntrain):
                 img_path=os.path.join(dst_path,img_name).replace('\\','/')
                 shutil.copy(os.path.join(root,file), img_path)
                 if count<itrain:
-                    fst.write('%s,%s\n'%(img_path,cls_map[root_name]))
+                    fst.write('%s,%s\n'%(img_name,cls_map[root_name]))
                 else:
-                    fsv.write('%s,%s\n'%(img_path,cls_map[root_name]))
+                    fsv.write('%s,%s\n'%(img_name,cls_map[root_name]))
 
 root=sys.argv[1]
 dst_path=sys.argv[2]

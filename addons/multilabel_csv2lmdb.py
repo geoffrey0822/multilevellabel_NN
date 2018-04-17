@@ -25,6 +25,11 @@ if len(sys.argv)>6:
     if len(size_str)>2:
         size=[int(size_str[0]),int(size_str[1]),int(size_str[2])]
 
+padded_size=[]
+if len(sys.argv)>8:
+    padded_size_str=sys.argv[8].split(',')
+    padded_size=[int(padded_size_str[0]),int(padded_size_str[1])]
+
 N=1000
 X=[]
 Y=[]
@@ -43,7 +48,7 @@ with open(csv_filepath,'r') as f:
         labels=fields[1].split(';')
         if nlabel==0:
             nlabel=len(labels)
-        if(size==[]):
+        if(size==[] and padded_size==[]):
             img=cv2.imread(img_path)
             bsize=img.nbytes
             data_size+=bsize
@@ -59,9 +64,9 @@ print 'number of label per data: %d'%nlabel
 
 N=total_data
 
-if size==[]:
+if size==[] and padded_size==[]:
     max_size=total_bytes*2
-else:
+elif padded_size==[]:
     #X=np.zeros((N,size[0],size[1],size[2]),dtype=uint8)
     #Y=np.zeros((N,nlabel),dtype=np.int32)
     #max_size=(X.nbytes+Y.nbytes)*2;
@@ -70,6 +75,13 @@ else:
     max_size+=N*4*nlabel
     label_size=N*4*nlabel
     max_size*=2
+else:
+    max_size=N*size[0]*padded_size[1]*padded_size[2]
+    data_size=N*size[0]*padded_size[1]*padded_size[2]
+    max_size+=N*4*nlabel
+    label_size=N*4*nlabel
+    max_size*=2
+    
 print 'the size of lmdb: %.2f mb'%(float(max_size)/1024/1024)
 
 X=[]
@@ -94,6 +106,12 @@ if version==2:
                 img=cv2.imread(img_path)
                 if size!=[]:
                     img=cv2.resize(img,(size[1],size[2]))
+                if padded_size!=[]:
+                    top=int(padded_size[0]-size[1]/2)
+                    bottom=top
+                    left=int(padded_size[1]-size[2]/2)
+                    right=left
+                    img=cv2.copyMakeBorder(img,top,bottom,left,right,cv2.BORDER_CONSTANT,None,[0,0,0])
                 caffe_data=img[:,:,(2,1,0)]
                 caffe_data=caffe_data.swapaxes(0,2).swapaxes(1,2)
                 datum=caffe_pb2.MultiLabelDatum()
@@ -101,10 +119,14 @@ if version==2:
                     datum.channels=caffe_data.shape[0]
                     datum.height=caffe_data.shape[1]
                     datum.width=caffe_data.shape[2]
-                else:
+                elif padded_size==[]:
                     datum.channels=size[0]
                     datum.height=size[1]
                     datum.width=size[2]
+                else:
+                    datum.channels=size[0]
+                    datum.height=padded_size[0]
+                    datum.width=padded_size[1]
                 datum.data=caffe_data.tobytes()
                 labels=[]
                 for j in range(nlabel):
@@ -136,6 +158,12 @@ else:
                     img=cv2.imread(img_path)
                     if size!=[]:
                         img=cv2.resize(img,(size[1],size[2]))
+                    if padded_size!=[]:
+                        top=int(padded_size[0]-size[1]/2)
+                        bottom=top
+                        left=int(padded_size[1]-size[2]/2)
+                        right=left
+                        img=cv2.copyMakeBorder(img,top,bottom,left,right,cv2.BORDER_CONSTANT,None,[0,0,0])
                     caffe_data=img[:,:,(2,1,0)]
                     caffe_data=caffe_data.swapaxes(0,2).swapaxes(1,2)
                     datum=caffe_pb2.Datum()
@@ -144,10 +172,14 @@ else:
                         datum.channels=caffe_data.shape[0]
                         datum.height=caffe_data.shape[1]
                         datum.width=caffe_data.shape[2]
-                    else:
+                    elif padded_size==[]:
                         datum.channels=size[0]
                         datum.height=size[1]
                         datum.width=size[2]
+                    else:
+                        datum.channels=size[0]
+                        datum.height=padded_size[0]
+                        datum.width=padded_size[1]
                     datum.data=caffe_data.tobytes()
                     labels=[]
                     lbl_datum.channels=nlabel
