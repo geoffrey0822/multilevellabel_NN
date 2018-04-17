@@ -29,6 +29,7 @@ padded_size=[]
 if len(sys.argv)>8:
     padded_size_str=sys.argv[8].split(',')
     padded_size=[int(padded_size_str[0]),int(padded_size_str[1])]
+    print padded_size
 
 N=1000
 X=[]
@@ -107,9 +108,9 @@ if version==2:
                 if size!=[]:
                     img=cv2.resize(img,(size[1],size[2]))
                 if padded_size!=[]:
-                    top=int(padded_size[0]-size[1]/2)
+                    top=int((padded_size[0]-size[1])/2)
                     bottom=top
-                    left=int(padded_size[1]-size[2]/2)
+                    left=int((padded_size[1]-size[2])/2)
                     right=left
                     img=cv2.copyMakeBorder(img,top,bottom,left,right,cv2.BORDER_CONSTANT,None,[0,0,0])
                 caffe_data=img[:,:,(2,1,0)]
@@ -159,9 +160,9 @@ else:
                     if size!=[]:
                         img=cv2.resize(img,(size[1],size[2]))
                     if padded_size!=[]:
-                        top=int(padded_size[0]-size[1]/2)
+                        top=int((padded_size[0]-size[1])/2)
                         bottom=top
-                        left=int(padded_size[1]-size[2]/2)
+                        left=int((padded_size[1]-size[2])/2)
                         right=left
                         img=cv2.copyMakeBorder(img,top,bottom,left,right,cv2.BORDER_CONSTANT,None,[0,0,0])
                     caffe_data=img[:,:,(2,1,0)]
