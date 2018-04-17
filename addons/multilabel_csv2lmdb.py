@@ -76,8 +76,8 @@ elif padded_size==[]:
     label_size=N*4*nlabel
     max_size*=2
 else:
-    max_size=N*size[0]*padded_size[1]*padded_size[2]
-    data_size=N*size[0]*padded_size[1]*padded_size[2]
+    max_size=N*size[0]*padded_size[0]*padded_size[1]
+    data_size=N*size[0]*padded_size[0]*padded_size[1]
     max_size+=N*4*nlabel
     label_size=N*4*nlabel
     max_size*=2
