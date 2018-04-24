@@ -41,15 +41,23 @@ for file in os.listdir(src):
             continue
         data=unpickle(os.path.join(src,file))
         labels=[]
+        supers=[]
         if version=='10':
             labels=data['labels']
         else:
             labels=data['fine_labels']
+            supers=data['coarse_labels']
         nRow=len(labels)
         millis = int(round(time.time() * 1000))
         for n in range(nRow):
             lbl_name=lbl_names[labels[n]]
             dst_path=os.path.join(dst,lbl_name)
+            if version=='100':
+                super_path=super_class[supers[n]]
+                dst_path=os.path.join(dst,super_path)
+                if not os.path.isdir(dst_path):
+                    os.mkdir(dst_path)
+                dst_path=os.path.join(dst_path,lbl_name)
             if not os.path.isdir(dst_path):
                 os.mkdir(dst_path)
             img_data=data['data'][n]
